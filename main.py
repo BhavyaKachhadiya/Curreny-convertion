@@ -25,12 +25,12 @@ def get_currencies():
     url = 'https://api.exchangerate-api.com/v4/latest/USD'
     response = requests.get(url)
 
-    if response.status_code == 200:
-        data = response.json()
-        currencies = list(data['rates'].keys())
-        return jsonify(currencies)
-    else:
-        return 'Unable to retrieve currencies'
+    # if response.status_code == 200:
+    data = response.json()
+    currencies = list(data['rates'].keys())
+    return jsonify(currencies)
+    # else:
+    return 'Unable to retrieve currencies'
 
 if __name__ == '__main__':
     app.run(debug=True)

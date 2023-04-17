@@ -1,14 +1,12 @@
-from flask import Flask, jsonify, request
+import uvicorn
+from fastapi import FastAPI
+
 import requests
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route('/currency_converter')
-def currency_converter():
-    amount = request.args.get('amount')
-    from_currency = request.args.get('from_currency')
-    to_currency = request.args.get('to_currency')
-
+@app.get('/currency_converter')
+def currency_converter(amount: float, from_currency: str, to_currency: str):
     url = f'https://api.exchangerate-api.com/v4/latest/{from_currency}'
     response = requests.get(url)
 
@@ -24,11 +22,11 @@ def currency_converter():
             "converted_amount": converted_amount,
             "formatted_amount": formatted_amount
         }
-        return jsonify(response_data)
+        return response_data
     else:
-        return jsonify({"error": f'Unable to convert {from_currency} to {to_currency}'})
+        return {"error": f'Unable to convert {from_currency} to {to_currency}'}
 
-@app.route('/currencies')
+@app.get('/currencies')
 def get_currencies():
     url = 'https://api.exchangerate-api.com/v4/latest/USD'
     response = requests.get(url)
@@ -36,9 +34,9 @@ def get_currencies():
     if response.status_code == 200:
         data = response.json()
         currencies = list(data['rates'].keys())
-        return jsonify(currencies)
+        return currencies
     else:
-        return jsonify({"error": "Unable to retrieve currencies"})
+        return {"error": "Unable to retrieve currencies"}
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    uvicorn.run(app, host='0.0.0.0', port=8000)
